@@ -19,14 +19,16 @@ pipeline {
         }
         stage("Build Application") {
             steps {
-                dir('/home/ubuntu/workspace/register-app-ci') {
+                dir('register-app-ci') { // Assuming 'register-app-ci' is the correct directory
                     sh "mvn clean package"
                 }
             }
         }
         stage("Test Application") {
             steps {
-                sh "mvn test"
+                dir('register-app-ci') { // Assuming 'register-app-ci' is the correct directory
+                    sh "mvn test"
+                }
             }
         }
     }
