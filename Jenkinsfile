@@ -18,10 +18,11 @@ pipeline {
             }
         }
         stage("Build Application") {
-            steps {
-                sh "mvn clean package"
-            }
+    steps {
+        dir('path/to/register-app-ci') {
+            sh "mvn clean package"
         }
+    }
         stage("Test Application") {
             steps {
                 sh "mvn test"
