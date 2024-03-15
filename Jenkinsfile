@@ -1,5 +1,5 @@
 pipeline {
-    agent { 
+    agent {
         label 'Jenkins-Agent'
     }
     tools {
@@ -18,11 +18,12 @@ pipeline {
             }
         }
         stage("Build Application") {
-    steps {
-        dir('path/to/register-app-ci') {
-            sh "mvn clean package"
+            steps {
+                dir('path/to/register-app-ci') {
+                    sh "mvn clean package"
+                }
+            }
         }
-    }
         stage("Test Application") {
             steps {
                 sh "mvn test"
