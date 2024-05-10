@@ -1,35 +1,45 @@
 pipeline {
-    agent {
-        label 'Jenkins-Agent'
+    agent { label "Jenkins-Agent" }
+    environment {
+              APP_NAME = "register-app-pipeline"
     }
-    tools {
-        jdk 'Java17'
-        maven 'Maven3'
-    }
+
     stages {
         stage("Cleanup Workspace") {
             steps {
                 cleanWs()
             }
         }
+
         stage("Checkout from SCM") {
+               steps {
+                   git branch: 'main', credentialsId: 'github', url: 'https://github.com/Hariompal4/gitops-register-app'
+               }
+        }
+
+        stage("Update the Deployment Tags") {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Hariompal4/gitops-register-app.git'
+                sh """
+                   cat deployment.yaml
+                   sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' deployment.yaml
+                   cat deployment.yaml
+                """
             }
         }
-        stage("Build Application") {
+
+        stage("Push the changed deployment file to Git") {
             steps {
-                dir('register-app-ci') { // Assuming 'register-app-ci' is the correct directory
-                    sh "mvn clean package"
+                sh """
+                   git config --global user.name "Hariompal4"
+                   git config --global user.email "hpal56101@gmail.com"
+                   git add deployment.yaml
+                   git commit -m "Updated Deployment Manifest"
+                """
+                withCredentials([gitUsernamePassword(credentialsId: 'github', gitToolName: 'Default')]) {
+                  sh "git push https://github.com/Ashfaque-9x/gitops-register-app main"
                 }
             }
         }
-        stage("Test Application") {
-            steps {
-                dir('register-app-ci') { // Assuming 'register-app-ci' is the correct directory
-                    sh "mvn test"
-                }
-            }
-        }
+      
     }
 }
